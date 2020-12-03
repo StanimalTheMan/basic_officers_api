@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from database.assignment import Assignment, AssignmentActions
 from decorators.auth import ensure_logged_in
 
-assignment = Blueprint('Assignment', __name__)
+assignment = Blueprint('assignment', __name__)
 
 # auxiliary create rank function
 def create_assignment(data):
@@ -18,12 +18,18 @@ def create_assignment(data):
         'overhire': data['overhire'],
         'remarks': data['remarks'],
         'officer_id': data['officer_id'],
-        'year_id': data['year_id']
+        'year_id': data['year_id'],
+        'position_title_id': data['position_title_id']
     }
     
     return new_assignment
 
-# GET ALL, POST new rank
+# original get route
+# @assignment.route('/assignments_original', methods=['GET'])
+# def get_assignments_orig():
+#     return AssignmentActions.get_all_orig()
+
+# GET ALL, POST new assignment
 @assignment.route('/assignments', methods=['GET', 'POST']) # default method is get, just being explicit
 # @ensure_logged_in
 def get_assignments():

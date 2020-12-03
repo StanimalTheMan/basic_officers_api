@@ -39,7 +39,8 @@ create_years_table = "CREATE TABLE IF NOT EXISTS years (id INTEGER PRIMARY KEY, 
 # - OVER HIRE 
 # - REMARKS
 create_assignments_table = "CREATE TABLE IF NOT EXISTS assignments (id INTEGER PRIMARY KEY, overhire BOOLEAN NOT NULL, remarks TEXT, \
-                            officer_id INTEGER NOT NULL, year_id INTEGER NOT NULL, \
+                            officer_id INTEGER NOT NULL, year_id INTEGER NOT NULL, position_title_id INTEGER NOT NULL, \
+                            UNIQUE(year_id, position_title_id) ON CONFLICT ABORT, \
                             FOREIGN KEY (officer_id) \
                             REFERENCES officers (id) \
                               ON UPDATE CASCADE \
@@ -47,8 +48,24 @@ create_assignments_table = "CREATE TABLE IF NOT EXISTS assignments (id INTEGER P
                             FOREIGN KEY (year_id) \
                             REFERENCES years (id) \
                               ON UPDATE CASCADE \
+                              ON DELETE CASCADE, \
+                            FOREIGN KEY (position_title_id) \
+                            REFERENCES position_titles (id) \
+                              ON UPDATE CASCADE \
                               ON DELETE CASCADE \
                             )"
+
+# alt database.db purpose
+# many to many
+create_position_years_table = "CREATE TABLE IF NOT EXISTS position_years ( \
+                                  id INTEGER PRIMARY KEY, \
+                                  position_title_id INTEGER NOT NULL, \
+                                  year_id INTEGER NOT NULL, \
+                                  FOREIGN KEY (position_title_id) \
+                                  REFERENCES position_titles(id), \
+                                  FOREIGN KEY (year_id) \
+                                  REFERENCES years(id) \
+                                  )"
 
 # table for users aka admins (atm not thinking about different roles separating normal users from admins)
 # passwords are plaintext for prototyping purposes
@@ -62,6 +79,7 @@ cursor.execute(create_years_table)
 cursor.execute(create_officers_table)
 cursor.execute(create_assignments_table)
 cursor.execute(create_users_table)
+cursor.execute(create_position_years_table)
 
 # add default officer ranks
 rank_records = [
@@ -122,6 +140,19 @@ mos_records = [
                 ]
 add_mos_query = "INSERT INTO mos VALUES (NULL, ?)"
 cursor.executemany(add_mos_query, mos_records)
+
+# add default annual/academic years
+year_records = [('AY2627',), ('AY2526',), ('AY2425',), ('AY2324',), ('AY2223',)]
+add_years_query = "INSERT INTO years VALUES (NULL, ?)"
+cursor.executemany(add_years_query, year_records)
+
+# alt database.db purpose
+# add default position title, academic year transactions
+# assume each position title has same academic annual years
+# how to enforce adding to this many to many table in frontend?
+position_year_records = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (3, 1), (3, 2), (3, 3), (3, 4), (3, 5)]
+add_position_years_query = "INSERT INTO position_years VALUES (NULL, ?, ?)"
+cursor.executemany(add_position_years_query, position_year_records)
 
 connection.commit()
 connection.close()

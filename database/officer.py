@@ -73,6 +73,32 @@ class OfficerActions():
         )
 
     @staticmethod
+    def get_officers_with_position_title(position_title_id):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "SELECT * FROM {table} WHERE position_id=?".format(table=Officer.TABLE_NAME)
+        results = cursor.execute(query, (position_title_id,))
+
+        personnel = []
+
+        for row in results:
+            personnel.append({
+                'id': row[0],
+                'full_name': row[1] + ' ' + row[2]
+            })
+
+        connection.close()
+
+        if personnel:
+            return jsonify(
+                personnel = personnel
+            )
+        return jsonify(
+            message = "No officers with position found"
+        )
+
+    @staticmethod
     def post(new_officer):
         try:
             # probably can isolate db connection into separate try except

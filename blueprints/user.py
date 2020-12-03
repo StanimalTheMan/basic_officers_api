@@ -4,11 +4,11 @@ from flask import (
 )
 # from werkzeug.security import safe_str_cmp
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 # from datetime import timedelta
 
 user = Blueprint('user', __name__)
-CORS(user)
+# CORS(user)
 
 # @user.before_request
 # def make_session_permanent():
@@ -46,6 +46,7 @@ def signup():
         ), 400
 
 @user.route('/login', methods=['POST'])
+# @cross_origin(expose_headers=['Set-Cookie'])
 def login():
     if request.is_json:
         # get user from database using username and then check credentials
@@ -66,6 +67,7 @@ def login():
                 return jsonify(
                     message = "Successfully logged in."
                 ), 200
+                # return session['user_id'], 200
             return jsonify(
                 message = "Invalid credentials.  Please try again."
             ), 400

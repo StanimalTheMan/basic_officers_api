@@ -43,6 +43,10 @@ def get_officers():
         error = "The request payload is not in JSON format"
     ), 400
 
+# NOT RESTFUL as getting officers with specific position id
+@officer.route('/officers/positionTitle/<int:position_title_id>', methods=['GET'])
+def get_officers_with_position_title(position_title_id):
+    return OfficerActions.get_officers_with_position_title(position_title_id)
 
 # GET SINGLE OFFICER
 @officer.route('/officers/<int:officer_id>', methods=['GET']) # default method is get

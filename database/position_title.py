@@ -33,9 +33,9 @@ class PositionTitle():
         return position_title
 
 class PositionTitleActions():
-    
+
     @staticmethod
-    def get_all():
+    def get_all_helper():
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -51,7 +51,11 @@ class PositionTitleActions():
                             })
 
         connection.close()
+        return pos_titles_lst
 
+    @staticmethod
+    def get_all():
+        pos_titles_lst = PositionTitleActions.get_all_helper()
         if pos_titles_lst:
             return jsonify(
                 officer_position_titles = pos_titles_lst
@@ -89,6 +93,7 @@ class PositionTitleActions():
     def update_position_title(position_title_id, new_position_title):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
+        print(position_title_id)
         query = "SELECT * FROM {table} WHERE id={positionTitleId}".format(table=PositionTitle.TABLE_NAME, positionTitleId=position_title_id)
 
         result = cursor.execute(query)
